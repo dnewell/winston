@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Winston</string>
+    <string name="stopservicebutton">Stop Winston Service</string>
+    <string name="startservicebutton">Start Winston Service</string>
+</resources>
