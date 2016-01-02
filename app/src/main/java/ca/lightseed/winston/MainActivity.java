@@ -1,44 +1,118 @@
 package ca.lightseed.winston;
-/**
- * Created by David on 2015-12-22.
- */
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.View;
-import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.Log;
+
+import com.commonsware.cwac.updater.ConfirmationStrategy;
+import com.commonsware.cwac.updater.DownloadStrategy;
+import com.commonsware.cwac.updater.ImmediateConfirmationStrategy;
+import com.commonsware.cwac.updater.InternalHttpDownloadStrategy;
+import com.commonsware.cwac.updater.SimpleHttpDownloadStrategy;
+import com.commonsware.cwac.updater.SimpleHttpVersionCheckStrategy;
+import com.commonsware.cwac.updater.UpdateRequest;
+import com.commonsware.cwac.updater.VersionCheckStrategy;
+
+import java.util.concurrent.ExecutionException;
+
+/**
+ *
+ * @author Atish Agrawal
+ *
+ */
+
+public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Button start = (Button) findViewById(R.id.startService);
-        Button stop = (Button) findViewById(R.id.stopService);
-        start.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                startService(new Intent(MainActivity.this, WinstonService.class));
-            }
-        });
-        stop.setOnClickListener(new View.OnClickListener() {
+        checkForUpdates();
 
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                stopService(new Intent(MainActivity.this, WinstonService.class));
-            }
-        });
+        startService(new Intent(this, AndroidLocationServices.class));
+
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("market://details?id=" + "TempleRun")));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://play.google.com/store/apps/details?id="
+                            + "TempleRun")));
+        }
+
+        finish();
+
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        // getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+    private void checkForUpdates() {
+        int currentVersionCode = 0, updatedVersionCode = 0;
+
+        try {
+            currentVersionCode = getPackageManager().getPackageInfo(
+                    getPackageName(), 0).versionCode;
+
+        } catch (Exception e) {
+            Log.e("UpdaterDemoActivity",
+                    "An exception occured while updating app", e);
+        }
+
+        try {
+            updatedVersionCode = new GetUpdateCode().execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        if (updatedVersionCode > currentVersionCode) {
+            updateAppFromServer();
+        }
+
     }
+
+    private void updateAppFromServer() {
+
+        // Updating application
+
+        UpdateRequest.Builder builder = new UpdateRequest.Builder(this);
+
+        builder.setVersionCheckStrategy(buildVersionCheckStrategy())
+                .setPreDownloadConfirmationStrategy(
+                        buildPreDownloadConfirmationStrategy())
+                .setDownloadStrategy(buildDownloadStrategy())
+                .setPreInstallConfirmationStrategy(
+                        buildPreInstallConfirmationStrategy()).execute();
+
+    }
+
+    /**
+     * The updater Class files are being added here
+     *
+     * The following code checks the version code from the server and presents
+     * an 'Update' screen to the user.
+     */
+
+    DownloadStrategy buildDownloadStrategy() {
+        if (Build.VERSION.SDK_INT >= 11) {
+            return (new InternalHttpDownloadStrategy());
+        }
+
+        return (new SimpleHttpDownloadStrategy());
+    }
+
+    ConfirmationStrategy buildPreDownloadConfirmationStrategy() {
+        return (new ImmediateConfirmationStrategy());
+    }
+
+    ConfirmationStrategy buildPreInstallConfirmationStrategy() {
+        return (new ImmediateConfirmationStrategy());
+    }
+
+    VersionCheckStrategy buildVersionCheckStrategy() {
+        return (new SimpleHttpVersionCheckStrategy(Constants.UPDATE_URL));
+    }
+
 }
