@@ -14,13 +14,17 @@
  *    limitations under the License.
  */
 /**
- * Utilizes the Google Play services API
+ * This class is a service which will use the Google Play services API
+ * (location services) to poll the user's device for current location
+ * and send it to the server as a name/value pair.
+ * TODO: Refactor to send JSON or similar, for easier extension. (eg. to send more contextual data.)
  */
 package ca.lightseed.winston;
 
 import android.os.AsyncTask;
 import android.util.Log;
-
+// Realizing that learning with deprecated tools isn't the best strategy
+// TODO: refactor with more modern alternative
 import org.apache.http.params.HttpParams;
 
 import java.io.IOException;

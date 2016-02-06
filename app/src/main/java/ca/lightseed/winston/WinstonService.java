@@ -42,7 +42,8 @@ public class WinstonService extends Service {
 
 
     /**
-     *
+     * Basic interface for synchronous API calls both in-process and cross-process
+     * (Data is sent as a 'Parcel', which is a generic buffer plus metadata
      * @param intent
      * @return
      */
@@ -53,7 +54,9 @@ public class WinstonService extends Service {
     }
 
     /**
-     *
+     * Creates the partial wake-lock which keeps CPU running, and allows this service
+     * to continue passing location data even with screen off.
+     * NOTE: WakeLocks consume battery very quickly.
      */
     @Override
     public void onCreate() {
@@ -61,11 +64,14 @@ public class WinstonService extends Service {
         PowerManager pm = (PowerManager) getSystemService(this.POWER_SERVICE);
 
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "DoNotSleep");
+        // TODO: Intrusively many toasts are generated. Fine for testing, not fine for release.
         Toast.makeText(this, "Created Winston tracking service", Toast.LENGTH_SHORT).show();
     }
 
     /**
-     *
+     * onStart begins the visible lifetime for the activity.
+     * This method performs a permissions check: the app requires either coarse or fine
+     * location data permissions to have any function.
      * @param intent
      * @param startId
      */
@@ -85,7 +91,9 @@ public class WinstonService extends Service {
     }
 
     /**
-     *
+     * onDestroy is called when the activity finishes, or is destroyed by the system.
+     * All cleanup functions should go here.
+     * The wakelock is released here.
      */
     @Override
     public void onDestroy() {
@@ -94,7 +102,12 @@ public class WinstonService extends Service {
         wakeLock.release();
     }
 
-    public static boolean isConnectingToInternet(Context _context) {
+    /**
+     * hasConnection method checks internet connectivity status
+     * @param _context a context
+     * @return true if device has network connection
+     */
+    public static boolean hasConnection(Context _context) {
         ConnectivityManager connectivity = (ConnectivityManager) _context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
@@ -109,18 +122,21 @@ public class WinstonService extends Service {
         return false;
     }
 
+    /**
+     * LocationListener
+     * TODO: Document this method
+     */
     private LocationListener listener = new LocationListener() {
 
         @Override
         public void onLocationChanged(Location location) {
-            // TODO Auto-generated method stub
 
             Log.e("Google", "Location Changed");
 
             if (location == null)
                 return;
-
-            if (isConnectingToInternet(getApplicationContext())) {
+            //
+            if (hasConnection(getApplicationContext())) {
                 JSONArray jsonArray = new JSONArray();
                 JSONObject jsonObject = new JSONObject();
 
@@ -138,7 +154,7 @@ public class WinstonService extends Service {
                     new LocationSendService().execute(new String[]{
                             Constants.TRACK_URL, jsonArray.toString()});
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
+                    // TODO Deal with exceptions more specifically.
                     e.printStackTrace();
                 }
 
