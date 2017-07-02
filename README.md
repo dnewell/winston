@@ -1,7 +1,7 @@
 
 
 # Winston
-### Winston is an educational GPS data analysis tool (and asynchronous message passer) for Android.
+### Winston is an educational GPS data analysis tool (and asynchronous message passer) for Android
 
 One half of a project intended to illuminate the ways that the large amount of data we generate each day might be used, this Android app which collects and analyzes data from a user's mobile device. The other half is a visualisation web service (using d3.js) which will help to facilitate an intuitive understanding of this continuous and complex flow of data.  Winston's architecture is trustless - all data is processed and fully encrypted client-side and is accessible only to the user themselves.
 
