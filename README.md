@@ -1,16 +1,15 @@
 
 
-#Winston
-Winston is a GPS data logger and asynchronous message passer for Android.
+# Winston
+### Winston is an educational GPS data analysis tool (and asynchronous message passer) for Android.
 
-It is one half of a project intended to illuminate the ways that the large amount of data tmost individuals devices generate each day might be used. This half of the project is an app which collects the data from a user's mobile device. The other half is a visualisation web service (using d3.js) which will help to facilitate an intuitive understanding of this continuous and complex flow of data.
+One half of a project intended to illuminate the ways that the large amount of data we generate each day might be used, this Android app which collects and analyzes data from a user's mobile device. The other half is a visualisation web service (using d3.js) which will help to facilitate an intuitive understanding of this continuous and complex flow of data.  Winston's architecture is trustless - all data is processed and fully encrypted client-side and is accessible only to the user themselves.
 
-My hope is that through this project, an individual might be empowered to make a more informed choice about the proliferation of their digital footprint. Perhaps to help one realise there are choices to be made in the first place, most of which are currently *made for them*, and not always in service of their interests and well-being.
+Many of our data-privacy choices are currently being *made for us*, and often not in service of our interests and long-term well-being. Winston aims to help individuals gain a more intuitive understanding of their digital footprint, and empower them to make more informed choices about its proliferation.
  
 
-###Author
+### Author
 
 Winston is currently being developed by [David Newell](http://www.davidnewell.ca), a computer science student at [Western University](http://uwo.ca/).
-_________
 
-#####The project is in its infancy; there is much to be done.
+_________
